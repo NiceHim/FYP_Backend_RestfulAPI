@@ -18,7 +18,7 @@ jobs:
     - name: Remove Old Docker image
       run: docker rmi $(docker images | grep 'fyp_backend_restfulapi_image') || true
     - name: Build the Docker image
-      run: docker build . --file Dockerfile 
+      run: docker build -t fyp_backend_restfulapi_image .
     - name: Remove Old Docker Container
       run: docker rm fyp_backend_restfulapi_container || true
     - name: Depoly to Docker Container
