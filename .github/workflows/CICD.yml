@@ -11,6 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Add the environment file
+      run: |
+        touch .env
+        echo "${{ secrets.ENV }}" > .env
     - name: Remove Old Docker image
       run: docker rmi $(docker images | grep 'fyp_backend_restfulapi_image') || true
     - name: Build the Docker image
