@@ -1,4 +1,4 @@
-FROM node:20.9.0-alpine
+FROM node:20-alpine
 WORKDIR /fyp_backend_restfulapi_app
 COPY package*.json ./
 RUN npm ci
