@@ -1,7 +1,7 @@
-FROM node:20-alpine
+FROM node:20.9.0-alpine
 WORKDIR /fyp_backend_restfulapi_app
 COPY package*.json ./
-RUN npm install --force
+RUN npm ci
 COPY . .
 RUN npm run build
 EXPOSE 3000
