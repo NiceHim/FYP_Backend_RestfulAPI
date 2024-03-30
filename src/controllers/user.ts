@@ -143,9 +143,7 @@ export async function getCurrentTransaction(req: Request, res: Response, next: N
                 message: "Cannot Get Current Transaction"
             });
         } else {
-            res.status(200).json({
-                message: "Successfully Get Current Transaction"
-            });
+            res.status(200).json(data);
         }
     } catch (error) {
         res.status(500).json({
