@@ -13,5 +13,6 @@ userRoutes.post("/withdraw", UserController.withdraw);
 userRoutes.post("/subscribe", UserController.insertSubscription);
 userRoutes.post("/subscription", UserController.getAllSubscription);
 userRoutes.post("/currentTransaction", UserController.getCurrentTransaction);
+userRoutes.post("/historyTransaction", UserController.getHistoryTransaction);
 
 export default userRoutes;

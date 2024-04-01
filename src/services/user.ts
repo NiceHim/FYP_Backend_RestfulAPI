@@ -189,3 +189,32 @@ export async function getCurrentTransaction(userName: string) {
         throw error;
     }
 }
+
+export async function getHistoryTransaction(userName: string) {
+    try {
+        const pipeline: Array<Document> = [
+            {
+                $match: { "userName": userName, "done": true }
+            }, 
+            {
+                $project: {
+                    "ticker": 1,
+                    "price": 1,
+                    "lot": 1,
+                    "action": 1,
+                    PnL: { $round: [ "$PnL", 2 ] },
+                    "createdAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$createdAt" } },
+                    "endedAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$endedAt" } },
+                    "_id": 0
+                }
+            },
+            {
+                $sort: { "endedAt": -1 }
+            }
+        ];
+        const result = await collections.transaction?.aggregate(pipeline).toArray();
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}

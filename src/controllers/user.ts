@@ -151,3 +151,21 @@ export async function getCurrentTransaction(req: Request, res: Response, next: N
         });
     }
 }
+
+export async function getHistoryTransaction(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { userName } = req.body.decoded;
+        const data = await UserService.getHistoryTransaction(userName);
+        if (data == null) {
+            res.status(400).json({
+                message: "Cannot Get Current Transaction"
+            });
+        } else {
+            res.status(200).json(data);
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
