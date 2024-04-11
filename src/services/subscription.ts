@@ -68,8 +68,8 @@ export async function getHistorySubscription(userName: string) {
                     "ticker": 1,
                     "lot": 1,
                     "status": 1,
-                    "doneAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$doneAt" } },
                     "createdAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$createdAt" } },
+                    "endedAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$endedAt" } },
                     "_id": 0
                 }
             },
@@ -116,7 +116,7 @@ export async function stopSubscription(userName: string, ticker: string, lot: nu
     try {
         const filter: StrictUpdateFilter<ISubscription> = { "userName": userName, "ticker": ticker, "lot": lot, "status": "running" };
         const updateFilter: UpdateFilter<ISubscription> = {
-            $set: { "status": "ended" } 
+            $set: { "status": "ended", "endedAt": new Date() } 
         };
         const result = await collections.subscription?.updateOne(filter, updateFilter);
         return result;
