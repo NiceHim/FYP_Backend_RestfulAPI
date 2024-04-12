@@ -61,7 +61,7 @@ export async function insertSubscription(req: Request, res: Response, next: Next
         const { userName } = req.body.decoded;
         const { ticker, lot } = req.body;
         const currentSubscription = await SubscriptionService.getOneCurrentSubscription(userName, ticker);
-        if (currentSubscription != null) {
+        if (currentSubscription !== null) {
             res.status(400).json({
                 message: `Subscription error, you have already subscribe ${ticker} auto trade service`
             });

@@ -86,7 +86,7 @@ export async function getHistorySubscription(userName: string) {
 
 export async function getOneCurrentSubscription(userName: string, ticker: string) {
     try {
-        const filter: StrictFilter<ISubscription> = { "userName": userName, "ticker": ticker, "done": false };
+        const filter: StrictFilter<ISubscription> = { "userName": userName, "ticker": ticker, "status": "running" };
         const result = await collections.subscription?.findOne(filter);
         return result
     } catch (error) {
