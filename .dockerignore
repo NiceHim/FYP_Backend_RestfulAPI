@@ -5,3 +5,4 @@ Dockerfile
 test.js
 dist
 docker-compose.yaml
+.github
