@@ -1,6 +1,7 @@
 import polygonRestfulClient from "../utils/polygonRestfulClient";
-import dotenv from "dotenv";
-dotenv.config();
+import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter, ObjectId } from "mongodb";
+import DBManager from "../db/DBManager";
+import IForexDetail from "../models/forexDetail";
 
 export async function getSnapShotTickers(tickers: string) {
     try {
@@ -32,6 +33,16 @@ export async function getMarketStatus() {
 export async function getLastQuote(firstTicker: string, secondTicker: string) {
     try {
         const data = await polygonRestfulClient.forex.lastQuote(firstTicker, secondTicker);
+        return data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function getForexList() {
+    try {
+        const filter: StrictFilter<IForexDetail> = { "available": true };
+        const data = await DBManager.getInstance().collections.forexList?.find(filter).toArray();
         return data;
     } catch (error) {
         throw error;

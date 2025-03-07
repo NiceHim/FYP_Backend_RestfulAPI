@@ -1,14 +1,13 @@
-import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter } from "mongodb";
-import { collections } from "../db/conn";
+import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter, ObjectId } from "mongodb";
+import DBManager from "../db/DBManager";
 import IUser from "../models/user";
 import IBalanceRecord from "../models/balanceRecord";
-import ISubscription from "../models/subscription";
 import dotenv from "dotenv";
 dotenv.config();
 
-export async function getUserInfo(userName: string) {
+export async function getUserInfo(userId: string) {
     try {
-        const filter: StrictFilter<IUser> = { "userName": userName };
+        const filter: StrictFilter<IUser> = { "_id": new ObjectId(userId) };
         const options: FindOptions<IUser> = {
             projection: {
                 "userName": 1,
@@ -19,18 +18,18 @@ export async function getUserInfo(userName: string) {
                 "_id": 0
             }
         };
-        const result = await collections.account?.findOne(filter, options);
+        const result = await DBManager.getInstance().collections.user?.findOne(filter, options);
         return result;
     } catch (error) {
         throw error;
     }
 }
 
-export async function getAllBalanceRecord(userName: string) {
+export async function getAllBalanceRecord(userId: string) {
     try {
         const pipeline: Array<Document> = [
             {
-                $match: { "userName": userName }
+                $match: { "userId": new ObjectId(userId) }
             }, 
             {
                 $project: {
@@ -44,129 +43,118 @@ export async function getAllBalanceRecord(userName: string) {
                 $sort: { "createdAt": -1 }
             }
         ];
-        const result = await collections.balanceRecord?.aggregate(pipeline).toArray();
+        const result = await DBManager.getInstance().collections.balanceRecord?.aggregate(pipeline).toArray();
         return result;
     } catch (error) {
         throw error;
     }
 }
 
-export async function deposit(userName: string, depositAmt: number) {
+export async function deposit(userId: string, depositAmt: number) {
     try {
-        const filter: StrictUpdateFilter<IUser> = { "userName": userName };
+        const filter: StrictUpdateFilter<IUser> = { "_id": new ObjectId(userId) };
         const updateFilter: UpdateFilter<IUser> = {
             $inc: { "balance": depositAmt, "equity": depositAmt } 
         };
-        const result = await collections.account?.updateOne(filter, updateFilter);
+        const result = await DBManager.getInstance().collections.user?.updateOne(filter, updateFilter);
         return result;
     } catch (error) {
         throw error;
     }
 }
 
-export async function withdraw(userName: string, withdrawAmt: number) {
+export async function withdraw(userId: string, withdrawAmt: number) {
     try {
-        const filter: StrictUpdateFilter<IUser> = { "userName": userName };
+        const filter: StrictUpdateFilter<IUser> = { "_id": new ObjectId(userId) };
         const updateFilter: UpdateFilter<IUser> = {
             $inc: { "balance": -withdrawAmt, "equity": -withdrawAmt }
         };
-        const result = await collections.account?.updateOne(filter, updateFilter);
+        const result = await DBManager.getInstance().collections.user?.updateOne(filter, updateFilter);
         return result;
     } catch (error) {
         throw error;
     }
 }
 
-export async function getBalance(userName: string) {
+export async function getBalance(userId: string) {
     try {
-        const filter: StrictFilter<IUser> = { "userName": userName };
+        const filter: StrictFilter<IUser> = { "_id": new ObjectId(userId) };
         const options: FindOptions<IUser> = {
             projection: {
                 "balance": 1,
                 "_id": 0
             }
         }
-        const result = await collections.account?.findOne(filter, options);
+        const result = await DBManager.getInstance().collections.user?.findOne(filter, options);
         return result?.balance;
     } catch (error) {
         throw error;
     }
 }
 
-export async function insertBalanceRecord(userName: string, action: string, amount: number) {
+export async function insertBalanceRecord(userId: string, action: string, amount: number) {
     try {
         const balanceRecord: IBalanceRecord = {
-            userName: userName,
+            userId: new ObjectId(userId),
             action: action,
             amount: amount,
             createdAt: new Date()
         };
-        const result = await collections.balanceRecord?.insertOne(balanceRecord);
+        const result = await DBManager.getInstance().collections.balanceRecord?.insertOne(balanceRecord);
         return result;
     } catch (error) {
         throw error;
     }
 }
 
-export async function getAllSubscription(userName: string) {
+export async function getTransaction(userId: string, done: boolean) {
     try {
+        let project;
+        if (done == true) {
+            project = {
+                "ticker": 1,
+                "price": 1,
+                "lot": 1,
+                "action": 1,
+                PnL: { $round: [ "$PnL", 2 ] },
+                "createdAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$createdAt" } },
+                "_id": 0
+            }
+        } else {
+            project = {
+                "ticker": 1,
+                "price": 1,
+                "lot": 1,
+                "action": 1,
+                PnL: { $round: [ "$PnL", 2 ] },
+                "createdAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$createdAt" } },
+                "endedAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$endedAt" } },
+                "_id": 0
+            }
+        }
         const pipeline: Array<Document> = [
             {
-                $match: { "userName": userName }
+                $match: { "userId": new ObjectId(userId), "done": done }
             }, 
             {
-                $project: {
-                    "ticker": 1,
-                    "lot": 1,
-                    "status": 1,
-                    "doneAt": 1,
-                    "createdAt": { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$createdAt" } },
-                    "_id": 0
-                }
+                $project: project
             },
             {
                 $sort: { "createdAt": -1 }
             }
         ];
-        const result = await collections.subscription?.aggregate(pipeline).toArray();
+        const result = await DBManager.getInstance().collections.transaction?.aggregate(pipeline).toArray();
         return result;
     } catch (error) {
         throw error;
     }
 }
 
-export async function getOneCurrentSubscription(userName: string, ticker: string) {
-    try {
-        const filter: StrictFilter<ISubscription> = { "userName": userName, "ticker": ticker, "done": false };
-        const result = await collections.subscription?.findOne(filter);
-        return result
-    } catch (error) {
-        throw error;
-    }
-}
-
-
-export async function insertSubscription(userName: string, ticker: string, lot: number) {
-    try {
-        const subscriptionOrder: ISubscription = {
-            userName: userName,
-            ticker: ticker,
-            lot: lot,
-            status: "running",
-            createdAt: new Date()
-        };
-        const result = await collections.subscription?.insertOne(subscriptionOrder);
-        return result;
-    } catch (error) {
-        throw error;
-    }
-}
-
-export async function getCurrentTransaction(userName: string) {
+export async function getCurrentTransaction(userId: string) {
     try {
         const pipeline: Array<Document> = [
             {
-                $match: { "userName": userName, "done": false }
+                $match: { "userId": new ObjectId(userId), "done": false }
             }, 
             {
                 $project: {
@@ -183,18 +171,18 @@ export async function getCurrentTransaction(userName: string) {
                 $sort: { "createdAt": -1 }
             }
         ];
-        const result = await collections.transaction?.aggregate(pipeline).toArray();
+        const result = await DBManager.getInstance().collections.transaction?.aggregate(pipeline).toArray();
         return result;
     } catch (error) {
         throw error;
     }
 }
 
-export async function getHistoryTransaction(userName: string) {
+export async function getHistoryTransaction(userId: string) {
     try {
         const pipeline: Array<Document> = [
             {
-                $match: { "userName": userName, "done": true }
+                $match: { "userId": new ObjectId(userId), "done": true }
             }, 
             {
                 $project: {
@@ -212,7 +200,7 @@ export async function getHistoryTransaction(userName: string) {
                 $sort: { "endedAt": -1 }
             }
         ];
-        const result = await collections.transaction?.aggregate(pipeline).toArray();
+        const result = await DBManager.getInstance().collections.transaction?.aggregate(pipeline).toArray();
         return result;
     } catch (error) {
         throw error;

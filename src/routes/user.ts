@@ -1,18 +1,18 @@
 import { Router } from "express";
-import * as UserController from "../controllers/user";
 import { verifyToken } from "../middlewares/verifyToken";
+import * as UserController from "../controllers/user";
+import * as UserValidator from "../validators/userValidator";
 
 const userRoutes = Router();
 
 userRoutes.use(verifyToken);
 
-userRoutes.post("/userInfo", UserController.getUserInfo);
-userRoutes.post("/balanceRecord", UserController.getAllBalanceRecord);
-userRoutes.post("/deposit", UserController.deposit);
-userRoutes.post("/withdraw", UserController.withdraw);
-userRoutes.post("/subscribe", UserController.insertSubscription);
-userRoutes.post("/subscription", UserController.getAllSubscription);
-userRoutes.post("/currentTransaction", UserController.getCurrentTransaction);
-userRoutes.post("/historyTransaction", UserController.getHistoryTransaction);
+userRoutes.get("/info", UserController.getUserInfo);
+userRoutes.get("/balance-records", UserController.getAllBalanceRecord);
+userRoutes.get("transactions", UserValidator.transactionValidator, UserController.getTransaction);
+userRoutes.get("/current-transactions", UserController.getCurrentTransaction);
+userRoutes.get("/history-transactions", UserController.getHistoryTransaction);
+userRoutes.post("/deposit", UserValidator.depositValidator, UserController.deposit);
+userRoutes.post("/withdraw", UserValidator.withdrawValidator, UserController.withdraw);
 
 export default userRoutes;

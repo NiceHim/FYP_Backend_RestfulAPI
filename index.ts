@@ -1,22 +1,36 @@
-import express, { Express, Request, Response , Application } from 'express';
-import { connDB } from "./src/db/conn";
+import express, { Express, Request, Response , Application, NextFunction } from 'express';
+import compression from "compression";
+import cookieParser from 'cookie-parser';
+import DBManager from './src/db/DBManager';
 import marketRoutes from "./src/routes/market";
 import authRoutes from "./src/routes/auth";
 import userRoutes from "./src/routes/user";
 import subscriptionRoutes from "./src/routes/subscription";
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+const env = process.env.NODE_ENV || "dev";
+dotenv.config({ path: path.resolve(__dirname, `.env.${env}`) });
 
 const app: Application = express();
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 3000;
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({origin: "*"}));
-
-connDB();
+app.use(cors({origin: process.env.CORS_ORIGIN || "http://localhost:5173", credentials: true}));
+app.use(compression(
+    { 
+        filter: (req: Request, res: Response) => {
+            if (req.headers['x-no-compression']) {
+                return false;
+            }
+            return compression.filter(req, res);
+        },
+        threshold: 1000
+    }
+));
 
 app.use("/market", marketRoutes);
 app.use("/auth", authRoutes);
@@ -27,4 +41,7 @@ app.get('/:id', (req: Request, res: Response) => {
     res.send('Welcome to Express & TypeScript Server');
 });
 
-app.listen(port);
+DBManager.getInstance().connDB().then(() => {
+    console.log("Database Connected")
+    app.listen(port);
+})

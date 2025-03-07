@@ -3,10 +3,10 @@ import * as UserService from "../services/user";
 
 export async function getUserInfo(req: Request, res: Response, next: NextFunction) {
     try {
-        const { userName } = req.body.decoded;
-        const data = await UserService.getUserInfo(userName);
+        const { userId } = req.decoded;
+        const data = await UserService.getUserInfo(userId);
         if (data == null) {
-            res.status(400).json({
+            res.status(404).json({
                 message: "Cannot find user information"
             });
         } else {
@@ -21,10 +21,10 @@ export async function getUserInfo(req: Request, res: Response, next: NextFunctio
 
 export async function getAllBalanceRecord(req: Request, res: Response, next: NextFunction) {
     try {
-        const { userName } = req.body.decoded;
-        const data = await UserService.getAllBalanceRecord(userName);
+        const { userId } = req.decoded;
+        const data = await UserService.getAllBalanceRecord(userId);
         if (data == null) {
-            res.status(400).json({
+            res.status(404).json({
                 message: "Cannot find balance record"
             });
         } else {
@@ -39,15 +39,15 @@ export async function getAllBalanceRecord(req: Request, res: Response, next: Nex
 
 export async function deposit(req: Request, res: Response, next: NextFunction) {
     try {
-        const { userName } = req.body.decoded;
+        const { userId } = req.decoded;
         const depositAmt = req.body.depositAmt;
-        const result = await UserService.deposit(userName, parseFloat(depositAmt));
+        const result = await UserService.deposit(userId, parseFloat(depositAmt));
         if (result == null) {
             res.status(400).json({
                 message: "Deposit Error"
             });
         } else {
-            await UserService.insertBalanceRecord(userName, "Deposit", parseFloat(depositAmt));
+            await UserService.insertBalanceRecord(userId, "Deposit", parseFloat(depositAmt));
             res.status(200).json({
                 message: "Successfully deposit"
             });
@@ -61,22 +61,22 @@ export async function deposit(req: Request, res: Response, next: NextFunction) {
 
 export async function withdraw(req: Request, res: Response, next: NextFunction) {
     try {
-        const { userName } = req.body.decoded;
+        const { userId } = req.decoded;
         const withdrawAmt = req.body.withdrawAmt;
-        const currentBalance = await UserService.getBalance(userName);
+        const currentBalance = await UserService.getBalance(userId);
         if (currentBalance != null && currentBalance < withdrawAmt) {
             res.status(400).json({
                 message: "Withdraw error, account balance does not have enough money"
             });
             return next();
         }
-        const result = await UserService.withdraw(userName, parseFloat(withdrawAmt));
+        const result = await UserService.withdraw(userId, parseFloat(withdrawAmt));
         if (result == null) {
             res.status(400).json({
                 message: "Withdraw Error"
             });
         } else {
-            await UserService.insertBalanceRecord(userName, "Withdraw", -parseFloat(withdrawAmt));
+            await UserService.insertBalanceRecord(userId, "Withdraw", -parseFloat(withdrawAmt));
             res.status(200).json({
                 message: "Successfully Withdraw"
             });
@@ -88,13 +88,14 @@ export async function withdraw(req: Request, res: Response, next: NextFunction) 
     }
 }
 
-export async function getAllSubscription(req: Request, res: Response, next: NextFunction) {
+export async function getTransaction(req: Request, res: Response, next: NextFunction) {
     try {
-        const { userName } = req.body.decoded;
-        const data = await UserService.getAllSubscription(userName);
+        const { done } = req.query;
+        const { userId } = req.decoded;
+        const data = await UserService.getTransaction(userId, Boolean(done));
         if (data == null) {
-            res.status(400).json({
-                message: "Cannot get subscription"
+            res.status(404).json({
+                message: "Cannot Find Transaction"
             });
         } else {
             res.status(200).json(data);
@@ -106,41 +107,13 @@ export async function getAllSubscription(req: Request, res: Response, next: Next
     }
 }
 
-export async function insertSubscription(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { userName } = req.body.decoded;
-        const { ticker, lot } = req.body;
-        const currentSubscription = await UserService.getOneCurrentSubscription(userName, ticker);
-        if (currentSubscription != null) {
-            res.status(400).json({
-                message: `Subscription error, you have already subscribe ${ticker} auto trade service`
-            });
-            return next();
-        }
-        const result = await UserService.insertSubscription(userName, ticker, lot);
-        if (result == null) {
-            res.status(400).json({
-                message: "Subscription Error"
-            });
-        } else {
-            res.status(200).json({
-                message: `Successfully Subscribe ${ticker} Auto Trade Service`
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-}
-
 export async function getCurrentTransaction(req: Request, res: Response, next: NextFunction) {
     try {
-        const { userName } = req.body.decoded;
-        const data = await UserService.getCurrentTransaction(userName);
+        const { userId } = req.decoded;
+        const data = await UserService.getCurrentTransaction(userId);
         if (data == null) {
             res.status(400).json({
-                message: "Cannot Get Current Transaction"
+                message: "Cannot Find Current Transaction"
             });
         } else {
             res.status(200).json(data);
@@ -154,11 +127,11 @@ export async function getCurrentTransaction(req: Request, res: Response, next: N
 
 export async function getHistoryTransaction(req: Request, res: Response, next: NextFunction) {
     try {
-        const { userName } = req.body.decoded;
-        const data = await UserService.getHistoryTransaction(userName);
+        const { userId } = req.decoded;
+        const data = await UserService.getHistoryTransaction(userId);
         if (data == null) {
             res.status(400).json({
-                message: "Cannot Get Current Transaction"
+                message: "Cannot Find Current Transaction"
             });
         } else {
             res.status(200).json(data);

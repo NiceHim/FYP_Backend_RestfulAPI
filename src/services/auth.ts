@@ -1,15 +1,15 @@
-import * as bcrypt from "bcrypt";
 import { StrictFilter } from "mongodb";
-import { collections } from "../db/conn";
+// import { collections } from "../db/conn";
+import DBManager from "../db/DBManager";
+import { hashPasswordBcrypt, comparePasswordBcrypt} from "../utils/passwordUtils";
 import IUser from "../models/user";
 import dotenv from "dotenv";
 dotenv.config();
 
-export async function createAccount(userName: string, password: string) {
+export async function createUser(userName: string, password: string) {
     try {
-        const saltRounds = 10;
-        const hash = await bcrypt.hash(password, saltRounds);
-        const account: IUser = {
+        const hash = await hashPasswordBcrypt(password);
+        const user: IUser = {
             userName: userName,
             hash: hash,
             balance: 0,
@@ -17,7 +17,7 @@ export async function createAccount(userName: string, password: string) {
             unrealizedPnL: 0,
             createdAt: new Date()
         };
-        const result = await collections.account?.insertOne(account);
+        const result = await DBManager.getInstance().collections.user?.insertOne(user);
         return result;
     } catch (error) {
         throw error;
@@ -27,7 +27,7 @@ export async function createAccount(userName: string, password: string) {
 export async function findUser(userName: string) {
     try {
         const filter: StrictFilter<IUser> = { "userName": userName };
-        const result = await collections.account?.findOne(filter);
+        const result = await DBManager.getInstance().collections.user?.findOne(filter);
         return result;
     } catch (error) {
         throw error;
@@ -36,7 +36,7 @@ export async function findUser(userName: string) {
 
 export async function login(password: string, hash: string) {
     try {
-        const result = await bcrypt.compare(password, hash);
+        const result = await comparePasswordBcrypt(password, hash);
         return result;
     } catch (error) {
         throw error;

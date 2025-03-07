@@ -1,14 +1,15 @@
 import { Router } from "express";
-import * as SubscriptionController from "../controllers/subscription";
 import { verifyToken } from "../middlewares/verifyToken";
+import * as SubscriptionController from "../controllers/subscription";
+import * as SubscirptionValidator from "../validators/subscriptionValidator";
 
 const subscriptionRoutes = Router();
 
 subscriptionRoutes.use(verifyToken);
 
-subscriptionRoutes.post("/subscribe", SubscriptionController.insertSubscription);
-subscriptionRoutes.post("/currentSubscription", SubscriptionController.getCurrentSubscription);
-subscriptionRoutes.post("/historySubscription", SubscriptionController.getHistorySubscription);
-subscriptionRoutes.post("/stopSubscription", SubscriptionController.stopSubscription);
+subscriptionRoutes.get("/current", SubscriptionController.getCurrentSubscription);
+subscriptionRoutes.get("/history", SubscriptionController.getHistorySubscription);
+subscriptionRoutes.post("/subscribe", SubscirptionValidator.createSubscriptionValidator, SubscriptionController.createSubscription);
+subscriptionRoutes.patch("/:ticker", SubscirptionValidator.updateSubscriptionValidator, SubscriptionController.updateSubscription);
 
 export default subscriptionRoutes;

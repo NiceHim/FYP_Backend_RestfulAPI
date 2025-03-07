@@ -2,3 +2,6 @@ dist
 node_modules
 test.js
 .env
+.env.*
+src/__test__
+jest.config.ts
