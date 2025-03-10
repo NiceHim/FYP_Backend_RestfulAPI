@@ -38,7 +38,7 @@ app.use("/user", userRoutes);
 app.use("/subscription", subscriptionRoutes);
 app.get('/:id', (req: Request, res: Response) => {
     console.log(req.params)
-    res.send('Welcome to Express & TypeScript Server');
+    res.send('Welcome to Express & TypeScript Server!!!');
 });
 
 DBManager.getInstance().connDB().then(() => {
