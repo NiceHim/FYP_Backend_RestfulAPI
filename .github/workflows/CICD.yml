@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository 
+        uses: actions/checkout@v4
+        
       - name: Add the environment file
         run: |
           touch .env.production
