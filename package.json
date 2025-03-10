@@ -7,7 +7,7 @@
     "test": "jest",
     "dev": "cross-env NODE_ENV=dev nodemon --files index.ts",
     "build:dev": "npx tsc && cp .env.dev dist/",
-    "build:prod": "npx tsc && sudo cp .env.production dist/",
+    "build:prod": "npx tsc && sudo ~/.env.production ~/dist/",
     "start": "NODE_ENV=production node ./dist/index.js"
   },
   "author": "",
