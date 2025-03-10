@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Add the environment file
-        uses: actions/checkout@v4
         run: |
           touch .env
           echo "${{ secrets.ENV }}" > .env.production
