@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import * as SubscriptionService from "../services/subscription";
+import * as SubscriptionService from "../services/subscriptionService";
 
 export async function getAllSubscription(req: Request, res: Response, next: NextFunction) {
     try {

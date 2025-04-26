@@ -2,10 +2,10 @@ import express, { Express, Request, Response , Application, NextFunction } from 
 import compression from "compression";
 import cookieParser from 'cookie-parser';
 import DBManager from './src/db/DBManager';
-import marketRoutes from "./src/routes/market";
-import authRoutes from "./src/routes/auth";
-import userRoutes from "./src/routes/user";
-import subscriptionRoutes from "./src/routes/subscription";
+import marketRoutes from "./src/routes/marketRoute";
+import authRoutes from "./src/routes/authRoute";
+import userRoutes from "./src/routes/userRoute";
+import subscriptionRoutes from "./src/routes/subscriptionRoute";
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';

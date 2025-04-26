@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import * as AuthService from "../services/auth";
+import * as AuthService from "../services/authService";
 import { generateToken } from "../utils/tokenUtils";
 
 export async function createUser(req: Request, res: Response, next: NextFunction) {

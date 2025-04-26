@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/verifyToken";
-import * as SubscriptionController from "../controllers/subscription";
+import * as SubscriptionController from "../controllers/subscriptionController";
 import * as SubscirptionValidator from "../validators/subscriptionValidator";
 
 const subscriptionRoutes = Router();

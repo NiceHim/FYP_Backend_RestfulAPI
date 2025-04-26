@@ -1,9 +1,14 @@
-FROM node:20.9.0-alpine
-RUN apk add g++ make py3-pip
-WORKDIR /fyp_backend_restfulapi_app
+FROM node:22.14.0-alpine AS build
+WORKDIR /build
 COPY package*.json ./
+RUN apk add --no-cache g++ make py3-pip
 RUN npm ci
 COPY . .
-RUN npm run build:prod
+RUN npm run build
+
+FROM node:22.14.0-alpine
+WORKDIR /app
+COPY --from=build /build/node_modules ./node_modules
+COPY --from=build /build/dist ./dist
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node", "dist/index.js"]

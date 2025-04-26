@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as MarketController from "../controllers/market";
+import * as MarketController from "../controllers/marketController";
 
 const marketRoutes = Router();
 

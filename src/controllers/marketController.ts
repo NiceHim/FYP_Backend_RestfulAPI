@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import * as MarketService from "../services/market";
+import * as MarketService from "../services/marketService";
 import { IAggs, IForexLastQuote } from "@polygon.io/client-js";
 import dayjs from 'dayjs';
 

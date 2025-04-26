@@ -1,5 +1,4 @@
 import { StrictFilter } from "mongodb";
-// import { collections } from "../db/conn";
 import DBManager from "../db/DBManager";
 import { hashPasswordBcrypt, comparePasswordBcrypt} from "../utils/passwordUtils";
 import IUser from "../models/user";
