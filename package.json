@@ -15,6 +15,7 @@
     "@polygon.io/client-js": "^7.3.2",
     "@types/express-session": "^1.18.0",
     "@types/node-jose": "^1.1.13",
+    "@types/object-hash": "^3.0.6",
     "bcrypt": "^5.1.1",
     "compression": "^1.7.5",
     "cookie-parser": "^1.4.6",
@@ -27,6 +28,8 @@
     "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.3.0",
+    "object-hash": "^3.0.0",
+    "redis": "^4.7.0",
     "ts-jest": "^29.2.4"
   },
   "devDependencies": {

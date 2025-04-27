@@ -7,9 +7,8 @@ const subscriptionRoutes = Router();
 
 subscriptionRoutes.use(verifyToken);
 
-subscriptionRoutes.get("/current", SubscriptionController.getCurrentSubscription);
-subscriptionRoutes.get("/history", SubscriptionController.getHistorySubscription);
-subscriptionRoutes.post("/subscribe", SubscirptionValidator.createSubscriptionValidator, SubscriptionController.createSubscription);
+subscriptionRoutes.get("/", SubscriptionController.getAllSubscription);
+subscriptionRoutes.post("/", SubscirptionValidator.createSubscriptionValidator, SubscriptionController.createSubscription);
 subscriptionRoutes.patch("/:ticker", SubscirptionValidator.updateSubscriptionValidator, SubscriptionController.updateSubscription);
 
 export default subscriptionRoutes;

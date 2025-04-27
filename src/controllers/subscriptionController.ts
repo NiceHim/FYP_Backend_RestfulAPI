@@ -3,47 +3,12 @@ import * as SubscriptionService from "../services/subscriptionService";
 
 export async function getAllSubscription(req: Request, res: Response, next: NextFunction) {
     try {
+        const { done } = req.query;
         const { userId } = req.decoded;
-        const data = await SubscriptionService.getAllSubscription(userId);
+        const data = await SubscriptionService.getAllSubscription(userId, done == "true" ? true : false);
         if (data == null) {
             res.status(404).json({
                 message: "Cannot get subscription"
-            });
-        } else {
-            res.status(200).json(data);
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-}
-
-export async function getCurrentSubscription(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { userId } = req.decoded;
-        const data = await SubscriptionService.getCurrentSubscription(userId);
-        if (data == null) {
-            res.status(404).json({
-                message: "Cannot get current subscription"
-            });
-        } else {
-            res.status(200).json(data);
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-}
-
-export async function getHistorySubscription(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { userId } = req.decoded;
-        const data = await SubscriptionService.getHistorySubscription(userId);
-        if (data == null) {
-            res.status(404).json({
-                message: "Cannot get history subscription"
             });
         } else {
             res.status(200).json(data);

@@ -9,6 +9,9 @@ import subscriptionRoutes from "./src/routes/subscriptionRoute";
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import transactionRoutes from './src/routes/transactionRoute';
+import balanceRecordRoutes from './src/routes/balanceRecordRoute';
+import RedisManager from './src/db/RedisManager';
 
 const env = process.env.NODE_ENV || "dev";
 dotenv.config({ path: path.resolve(__dirname, `.env.${env}`) });
@@ -35,7 +38,9 @@ app.use(compression(
 app.use("/market", marketRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
-app.use("/subscription", subscriptionRoutes);
+app.use("/subscriptions", subscriptionRoutes);
+app.use("/transactions", transactionRoutes);
+app.use("/balance-records", balanceRecordRoutes);
 app.get('/:id', (req: Request, res: Response) => {
     console.log(req.params)
     res.send('Welcome to Express & TypeScript Server!!!');
@@ -43,5 +48,8 @@ app.get('/:id', (req: Request, res: Response) => {
 
 DBManager.getInstance().connDB().then(() => {
     console.log("Database Connected")
-    app.listen(port);
+    RedisManager.getInstance().then(() => {
+        console.log("Redis Connected")
+        app.listen(port);
+    })
 })
