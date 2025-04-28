@@ -1,5 +1,5 @@
 import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter, ObjectId, TransactionOptions } from "mongodb";
-import DBManager from "../db/DBManager";
+import MongoDBManager from "../db/MongoDBManager";
 import IUser from "../models/user";
 import dotenv from "dotenv";
 import RedisManager from "../db/RedisManager";
@@ -18,7 +18,7 @@ export async function getUserInfo(userId: string) {
                 "_id": 0
             }
         };
-        const result = await DBManager.getInstance().collections.user?.findOne(filter, options);
+        const result = await MongoDBManager.getInstance().collections.user?.findOne(filter, options);
         return result;
     } catch (error) {
         throw error;
@@ -33,21 +33,21 @@ export async function deposit(userId: string, depositAmt: number) {
         readConcern: { level: 'local' },
         writeConcern: { w: 'majority' }
     };
-    const session = DBManager.getInstance().client!.startSession();
+    const session = MongoDBManager.getInstance().client!.startSession();
     try {
         const result = await session.withTransaction(async (session) => {
             const filter: StrictUpdateFilter<IUser> = { "_id": new ObjectId(userId) };
             const updateFilter: UpdateFilter<IUser> = {
                 $inc: { "balance": depositAmt, "equity": depositAmt } 
             };
-            await DBManager.getInstance().collections.user?.updateOne(filter, updateFilter, { session });
+            await MongoDBManager.getInstance().collections.user?.updateOne(filter, updateFilter, { session });
             const balanceRecord: Document = {
                 userId: new ObjectId(userId),
                 action: "Deposit",
                 amount: depositAmt,
                 createdAt: new Date()
             };
-            await DBManager.getInstance().collections.balanceRecord?.insertOne(balanceRecord, { session });
+            await MongoDBManager.getInstance().collections.balanceRecord?.insertOne(balanceRecord, { session });
             return "Transaction completed successfully";
         }, transactionOptions);
         return result;
@@ -64,21 +64,21 @@ export async function withdraw(userId: string, withdrawAmt: number) {
         readConcern: { level: 'local' },
         writeConcern: { w: 'majority' }
     };
-    const session = DBManager.getInstance().client!.startSession();
+    const session = MongoDBManager.getInstance().client!.startSession();
     try {
         const result = await session.withTransaction(async (session) => {
             const filter: StrictUpdateFilter<IUser> = { "_id": new ObjectId(userId) };
             const updateFilter: UpdateFilter<IUser> = {
                 $inc: { "balance": -withdrawAmt, "equity": -withdrawAmt } 
             };
-            await DBManager.getInstance().collections.user?.updateOne(filter, updateFilter, { session });
+            await MongoDBManager.getInstance().collections.user?.updateOne(filter, updateFilter, { session });
             const balanceRecord: Document = {
                 userId: new ObjectId(userId),
                 action: "Withdraw",
                 amount: withdrawAmt,
                 createdAt: new Date()
             };
-            await DBManager.getInstance().collections.balanceRecord?.insertOne(balanceRecord, { session });
+            await MongoDBManager.getInstance().collections.balanceRecord?.insertOne(balanceRecord, { session });
             return "Transaction completed successfully";
         }, transactionOptions);
         return result;
@@ -96,7 +96,7 @@ export async function getBalance(userId: string) {
                 "_id": 0
             }
         }
-        const result = await DBManager.getInstance().collections.user?.findOne(filter, options);
+        const result = await MongoDBManager.getInstance().collections.user?.findOne(filter, options);
         return result?.balance;
     } catch (error) {
         throw error;

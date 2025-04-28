@@ -5,8 +5,8 @@ import ISubscription from "../models/subscription";
 import ITransaction from "../models/transaction";
 import IForexDetail from "../models/forexDetail";
 
-class DBManager {
-    private static dbManager: DBManager;
+class MongoDBManager {
+    private static dbManager: MongoDBManager;
     private _client?: MongoClient;
     private _db?: Db;
     private mongoUrl: string = process.env.MONGODB_URI || "";
@@ -22,11 +22,11 @@ class DBManager {
     private constructor() {
     }
 
-    static getInstance(): DBManager {
+    static getInstance(): MongoDBManager {
         if (this.dbManager) {
             return this.dbManager;
         } else {
-            this.dbManager = new DBManager();
+            this.dbManager = new MongoDBManager();
             return this.dbManager;
         }
     }
@@ -42,9 +42,13 @@ class DBManager {
 
     async connDB() {
         try {
-            this._client = new MongoClient(this.mongoUrl);
+            this._client = new MongoClient(this.mongoUrl, {
+                writeConcern: { w: "majority" },
+                readConcern: { level: "majority" },
+                readPreference: "secondaryPreferred",
+            });
             await this._client.connect();
-            this._db = DBManager.getInstance().client!.db(this.mongoDbName);
+            this._db = MongoDBManager.getInstance().client!.db(this.mongoDbName);
             this._collections.user = this._db?.collection<IUser>("account");
             this._collections.balanceRecord = this._db?.collection<IBalanceRecord>("balanceRecord");
             this._collections.subscription = this._db?.collection<ISubscription>("subscription");
@@ -66,4 +70,4 @@ class DBManager {
     }
 }
 
-export default DBManager;
+export default MongoDBManager;

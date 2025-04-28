@@ -1,5 +1,5 @@
 import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter, ObjectId } from "mongodb";
-import DBManager from "../db/DBManager";
+import MongoDBManager from "../db/MongoDBManager";
 import IBalanceRecord from "../models/balanceRecord";
 import RedisManager from "../db/RedisManager";
 
@@ -29,7 +29,7 @@ export async function getAllBalanceRecord(userId: string) {
             }
         ];
 
-        const result = await DBManager.getInstance().collections.balanceRecord?.aggregate<IBalanceRecord>(pipeline).toArray();
+        const result = await MongoDBManager.getInstance().collections.balanceRecord?.aggregate<IBalanceRecord>(pipeline).toArray();
         await RedisManager.setCacheData(cacheKey, result, 60 * 5);
         return result;
     } catch (error) {
@@ -47,7 +47,7 @@ export async function insertBalanceRecord(userId: string, action: string, amount
             amount: amount,
             createdAt: new Date()
         };
-        const result = await DBManager.getInstance().collections.balanceRecord?.insertOne(balanceRecord);
+        const result = await MongoDBManager.getInstance().collections.balanceRecord?.insertOne(balanceRecord);
         return result;
     } catch (error) {
         throw error;

@@ -1,7 +1,7 @@
 import express, { Express, Request, Response , Application, NextFunction } from 'express';
 import compression from "compression";
 import cookieParser from 'cookie-parser';
-import DBManager from './src/db/DBManager';
+import DBManager from './src/db/MongoDBManager';
 import marketRoutes from "./src/routes/marketRoute";
 import authRoutes from "./src/routes/authRoute";
 import userRoutes from "./src/routes/userRoute";

@@ -1,5 +1,5 @@
 import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter, ObjectId } from "mongodb";
-import DBManager from "../db/DBManager";
+import MongoDBManager from "../db/MongoDBManager";
 import ISubscription from "../models/subscription";
 import dotenv from "dotenv";
 import RedisManager from "../db/RedisManager";
@@ -43,7 +43,7 @@ export async function getAllSubscription(userId: string, done: boolean) {
                 $sort: { "createdAt": -1 }
             }
         ];
-        const result = await DBManager.getInstance().collections.subscription?.aggregate(pipeline).toArray();
+        const result = await MongoDBManager.getInstance().collections.subscription?.aggregate(pipeline).toArray();
         await RedisManager.setCacheData(cacheKey, result, 60 * 5);
         return result;
     } catch (error) {
@@ -54,7 +54,7 @@ export async function getAllSubscription(userId: string, done: boolean) {
 export async function getOneCurrentSubscription(userId: string, ticker: string) {
     try {
         const filter: StrictFilter<ISubscription> = { "userId": new ObjectId(userId), "ticker": ticker, "done": false };
-        const result = await DBManager.getInstance().collections.subscription?.findOne(filter);
+        const result = await MongoDBManager.getInstance().collections.subscription?.findOne(filter);
         return result
     } catch (error) {
         throw error;
@@ -72,7 +72,7 @@ export async function createSubscription(userId: string, ticker: string, lot: nu
             done: false,
             createdAt: new Date()
         };
-        const result = await DBManager.getInstance().collections.subscription?.insertOne(subscriptionOrder);
+        const result = await MongoDBManager.getInstance().collections.subscription?.insertOne(subscriptionOrder);
         return result;
     } catch (error) {
         throw error;
@@ -90,7 +90,7 @@ export async function updateSubscription(userId: string, ticker: string, updateO
         const updateFilter: UpdateFilter<ISubscription> = {
             $set: updateObj 
         };
-        const result = await DBManager.getInstance().collections.subscription?.updateOne(filter, updateFilter);
+        const result = await MongoDBManager.getInstance().collections.subscription?.updateOne(filter, updateFilter);
         return result;
     } catch (error) {
         throw error;

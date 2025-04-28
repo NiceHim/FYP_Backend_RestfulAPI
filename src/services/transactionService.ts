@@ -1,5 +1,5 @@
 import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter, ObjectId, Transaction } from "mongodb";
-import DBManager from "../db/DBManager";
+import MongoDBManager from "../db/MongoDBManager";
 import RedisManager from "../db/RedisManager";
 
 
@@ -45,7 +45,7 @@ export async function getTransaction(userId: string, done: boolean) {
                 $sort: { "createdAt": -1 }
             }
         ];
-        const result = await DBManager.getInstance().collections.transaction?.aggregate<Transaction>(pipeline).toArray();
+        const result = await MongoDBManager.getInstance().collections.transaction?.aggregate<Transaction>(pipeline).toArray();
         await RedisManager.setCacheData(cacheKey, result, 60 *5);
         return result;
     } catch (error) {

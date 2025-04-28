@@ -1,6 +1,6 @@
 import polygonRestfulClient from "../utils/polygonRestfulClient";
 import { StrictFilter, StrictUpdateFilter, Document, FindOptions, UpdateFilter, ObjectId } from "mongodb";
-import DBManager from "../db/DBManager";
+import MongoDBManager from "../db/MongoDBManager";
 import IForexDetail from "../models/forexDetail";
 import { IAggs, IForexLastQuote } from "@polygon.io/client-js";
 import { IReducedLastQuote } from "../models/reducedLastQuote";
@@ -148,7 +148,7 @@ export async function getAllLastQuotes(forexList: Array<IForexDetail>) {
 export async function getForexList() {
     try {
         const filter: StrictFilter<IForexDetail> = { "available": true };
-        const data = await DBManager.getInstance().collections.forexList?.find(filter).toArray();
+        const data = await MongoDBManager.getInstance().collections.forexList?.find(filter).toArray();
         return data;
     } catch (error) {
         throw error;
